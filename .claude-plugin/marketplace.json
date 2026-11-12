@@ -1,0 +1,18 @@
+{
+  "name": "yapi-skills",
+  "owner": {
+    "name": "yapi777"
+  },
+  "metadata": {
+    "description": "日本語で使う Claude Code のスキル集。テーマごとのプラグインに分けて配布しています。"
+  },
+  "plugins": [
+    {
+      "name": "research-slides",
+      "source": "./plugins/research-slides",
+      "description": "研究の記録から発表の構成案を作り、進捗報告の PowerPoint（4:3）に仕上げるスキル2つ（create-doc / progress-report-deck）。",
+      "category": "productivity",
+      "keywords": ["powerpoint", "pptx", "slides", "research", "japanese"]
+    }
+  ]
+}

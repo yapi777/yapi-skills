@@ -1,0 +1,11 @@
+{
+  "name": "research-slides",
+  "description": "研究の記録から発表の構成案（Markdown）を作り（create-doc）、研究室の進捗報告 PowerPoint に仕上げる（progress-report-deck）。16pt 以上・2色配色・OMML 数式などのデザインルール付き。",
+  "author": {
+    "name": "yapi777"
+  },
+  "homepage": "https://github.com/yapi777/yapi-skills",
+  "repository": "https://github.com/yapi777/yapi-skills",
+  "license": "MIT",
+  "keywords": ["powerpoint", "pptx", "slides", "research", "japanese"]
+}

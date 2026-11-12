@@ -1,0 +1,11 @@
+# スライド作成の作業ファイル
+unpacked/
+render_check/
+stage*.pptx
+check.md
+# Python / OS
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+~$*
