@@ -9,6 +9,17 @@
 
 2つを続けて使うのが基本の流れです（`create-doc` で構成案 → `progress-report-deck` でスライド化）。`progress-report-deck` は、手書きのメモや下書きの md からでも作れます。
 
+## インストール
+
+Claude Code の中で:
+
+```
+/plugin marketplace add yapi777/yapi-skills
+/plugin install research-slides@yapi-skills
+```
+
+プラグインを使わずに入れる方法（`setup.sh` / `setup.ps1`）は、[リポジトリの README](../../README.md#インストール) を見てください。
+
 ## 組み込まれているデザインルール
 
 - 文字は **16pt 以上**（図の注や引用文献も）
