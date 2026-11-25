@@ -38,6 +38,11 @@ GRAY = RGBColor(0x59, 0x59, 0x59)          # 補足・出典
 GRAY_LIGHT = RGBColor(0xF0, 0xF0, 0xF0)    # 中立パネル
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 BLACK = RGBColor(0x1A, 0x1A, 0x1A)
+# ポイント表示（電球）用の黄色。テーマの2色とは別枠で、「ここが要点」の印にだけ使う。
+YELLOW = RGBColor(0xF2, 0xB7, 0x05)        # 電球・ポイント表示の左の太線・「確かめること」の見出し
+YELLOW_LIGHT = RGBColor(0xFF, 0xF4, 0xCC)  # ポイント表示の地色
+YELLOW_DARK = RGBColor(0xB8, 0x86, 0x0B)   # 電球の光の線・黄色の矢印線・黄色系の注記文字（太字にしない）
+GRAY_MID = RGBColor(0xBF, 0xBF, 0xBF)      # 矢印・枠線などの中立のグレー
 
 _DEFAULT_ACCENTS = ("156082", "E97132")
 _DEFAULT_PALETTE = (NAVY, ACCENT1, BLUE_LIGHT, ORANGE, ORANGE_DARK, ORANGE_LIGHT)
@@ -454,3 +459,50 @@ def normalize_bold_color(prs, skip=(), colored=None):
                         _etree.SubElement(sf, _qn("a:srgbClr")).set("val", "1A1A1A")
                         n += 1
     return n
+
+
+# --- ポイント表示（黄色の電球） -------------------------------------------------
+import math as _math
+from pptx.enum.shapes import MSO_CONNECTOR as _MSO_CONNECTOR
+
+
+def add_bulb(slide, cx, cy, s, color=None, base=None, ray=None):
+    """中心 (cx, cy)・大きさ s [EMU] の電球（黄色の球＋灰色の口金＋光の線5本）を図形で描く。"""
+    color = color or YELLOW
+    base = base or RGBColor(0x7F, 0x7F, 0x7F)
+    ray = ray or YELLOW_DARK
+    d = int(s * 0.56)
+    bx, by = int(cx - d / 2), int(cy - s * 0.5 + s * 0.18)
+    bulb = slide.shapes.add_shape(MSO_SHAPE.OVAL, bx, by, d, d)
+    neck = slide.shapes.add_shape(MSO_SHAPE.TRAPEZOID, int(cx - s * 0.17), by + int(d * 0.80), int(s * 0.34), int(s * 0.13))
+    neck.rotation = 180
+    b1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, int(cx - s * 0.15), by + int(d * 0.80 + s * 0.15), int(s * 0.30), int(s * 0.07))
+    b2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, int(cx - s * 0.11), by + int(d * 0.80 + s * 0.25), int(s * 0.22), int(s * 0.07))
+    for sh, c in ((bulb, color), (neck, color), (b1, base), (b2, base)):
+        sh.fill.solid(); sh.fill.fore_color.rgb = c; sh.line.fill.background(); _no_shadow(sh)
+    bulb.line.color.rgb = ray; bulb.line.width = Pt(0.75)
+    ocx, ocy = cx, by + d / 2
+    for ang in (90, 45, 135, 5, 175):
+        a = _math.radians(ang)
+        r1, r2 = s * 0.37, s * 0.52
+        ln = slide.shapes.add_connector(_MSO_CONNECTOR.STRAIGHT, int(ocx + r1 * _math.cos(a)), int(ocy - r1 * _math.sin(a)),
+                                        int(ocx + r2 * _math.cos(a)), int(ocy - r2 * _math.sin(a)))
+        ln.line.color.rgb = ray; ln.line.width = Pt(max(1.75, s / 230000))
+    return bulb
+
+
+def add_point(slide, x, y, w, h, paragraphs, sz=18, icon_s=None, align=PP_ALIGN.LEFT):
+    """ポイント表示: 淡黄の地＋左端に黄色の太線＋黄色の電球。文はすべて太字の黒。
+
+    1スライドに1か所まで（本編の結論の1文に使う。補足スライドには付けない）。
+    paragraphs は add_panel と同じ [[(text, bold, color), ...], ...]。bold・color は無視して太字の黒にする。
+    1行なら h=600,000〜720,000、2行なら h=820,000〜950,000 が目安。
+    """
+    paras = [[(t[0], True, BLACK) for t in para] for para in paragraphs]
+    bg = add_panel(slide, x, y, w, h, YELLOW_LIGHT, paras, sz=sz, align=align)
+    bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, Emu(80000), h)
+    bar.fill.solid(); bar.fill.fore_color.rgb = YELLOW; bar.line.fill.background(); _no_shadow(bar)
+    s = icon_s or min(int(h * 0.72), 500000)
+    bg.text_frame.margin_left = Emu(int(80000 + s * 0.9 + 200000))
+    add_bulb(slide, x + 80000 + 110000 + s * 0.45, y + h / 2, s)
+    return bg

@@ -714,6 +714,8 @@ def build_palette(base_pptx):
         for mod, off in ((0.75, 0), (0.5, 0), (0.2, 0.8), (0.4, 0.6), (0.6, 0.4)):
             allowed.add(str(deck_style._lum(acc, mod, off)).upper())
     allowed |= {str(deck_style.GRAY).upper(), str(deck_style.GRAY_LIGHT).upper()}
+    # ポイント表示（電球）の黄色はテーマの2色とは別枠で使ってよい
+    allowed |= {str(c).upper() for c in (deck_style.YELLOW, deck_style.YELLOW_LIGHT, deck_style.YELLOW_DARK)}
     return allowed, (a1, a2)
 
 
